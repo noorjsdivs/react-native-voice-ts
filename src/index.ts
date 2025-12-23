@@ -497,4 +497,19 @@ export type {
   Language,
 } from './VoiceUtilTypes';
 
+// Export components
+export { VoiceMicrophone, MicIcon, MicOffIcon } from './components';
+export type {
+  VoiceMicrophoneProps,
+  MicIconProps,
+  MicOffIconProps,
+} from './components';
+
+// Export hooks
+export { useVoiceRecognition } from './hooks';
+export type {
+  UseVoiceRecognitionOptions,
+  UseVoiceRecognitionReturn,
+} from './hooks';
+
 export default new RCTVoice();

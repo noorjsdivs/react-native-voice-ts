@@ -1,7 +1,7 @@
 {
   "name": "react-native-voice-ts",
-  "description": "React Native Native Voice library for iOS and Android",
-  "version": "1.0.0",
+  "description": "Advanced Speech-to-Text library for React Native with TypeScript support. Features ready-to-use components (VoiceMicrophone), custom hooks (useVoiceRecognition), real-time transcription, multi-language support, and comprehensive voice recognition capabilities for iOS and Android.",
+  "version": "1.0.1",
   "author": "Noor Mohammad <noor.jsdivs@gmail.com>",
   "private": false,
   "homepage": "https://github.com/noorjsdivs/react-native-voice-ts",
@@ -21,6 +21,7 @@
     "prettier": "^3.7.4",
     "react": "^19.2.1",
     "react-native": "^0.83.0",
+    "react-native-svg": "^15.15.1",
     "semantic-release": "^25.0.2",
     "typescript": "5.9.3"
   },
@@ -43,13 +44,31 @@
   "source": "src/index.ts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "android",
+    "ios",
+    "plugin",
+    "app.plugin.js",
+    "react-native-voice.podspec",
+    "README.md",
+    "LICENSE",
+    "COMPONENT_USAGE.md",
+    "CONTRIBUTING.md",
+    "MIGRATION_SUMMARY.md"
+  ],
   "peerDependencies": {
     "expo": ">=48.0.0",
     "react": ">=18.0.0",
-    "react-native": ">=0.71.0"
+    "react-native": ">=0.71.0",
+    "react-native-svg": ">=13.0.0"
   },
   "peerDependenciesMeta": {
     "expo": {
+      "optional": true
+    },
+    "react-native-svg": {
       "optional": true
     }
   },
@@ -60,10 +79,9 @@
   "bugs": {
     "url": "https://github.com/noorjsdivs/react-native-voice-ts/issues"
   },
-
   "scripts": {
-    "lint": "eslint src/* --fix",
-    "lint:check": "eslint src/*",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
+    "lint:check": "eslint \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "semantic-release": "semantic-release",

@@ -2059,11 +2059,6 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
-"@react-native-voice/voice@file:..":
-  version "3.2.4"
-  dependencies:
-    invariant "^2.2.4"
-
 "@react-native/assets-registry@0.76.9":
   version "0.76.9"
   resolved "https://registry.yarnpkg.com/@react-native/assets-registry/-/assets-registry-0.76.9.tgz#ec63d32556c29bfa29e55b5e6e24c9d6e1ebbfac"
@@ -6173,6 +6168,11 @@ react-is@^16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
+
+"react-native-voice-ts@file:..":
+  version "1.0.0"
+  dependencies:
+    invariant "^2.2.4"
 
 react-native@0.76.9:
   version "0.76.9"

@@ -1,7 +1,7 @@
 {
   "name": "react-native-voice-ts",
   "description": "Advanced Speech-to-Text library for React Native with TypeScript support. Features ready-to-use components (VoiceMicrophone), custom hooks (useVoiceRecognition), real-time transcription, multi-language support, and comprehensive voice recognition capabilities for iOS and Android.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Noor Mohammad <noor.jsdivs@gmail.com>",
   "private": false,
   "homepage": "https://github.com/noorjsdivs/react-native-voice-ts",
@@ -22,7 +22,7 @@
     "react": "^19.2.1",
     "react-native": "^0.83.0",
     "react-native-svg": "^15.15.1",
-    "semantic-release": "^25.0.2",
+    "semantic-release": "^23.0.0",
     "typescript": "5.9.3"
   },
   "keywords": [

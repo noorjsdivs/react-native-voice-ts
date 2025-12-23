@@ -47,6 +47,20 @@ export interface VoiceMicrophoneProps {
   enablePartialResults?: boolean;
 
   /**
+   * Whether to continue listening after getting results (continuous mode)
+   * When enabled, the microphone will automatically restart after getting results
+   * @default false
+   */
+  continuous?: boolean;
+
+  /**
+   * Maximum silence duration in milliseconds before stopping (continuous mode)
+   * Only applies when continuous mode is enabled
+   * @default 5000 (5 seconds)
+   */
+  maxSilenceDuration?: number;
+
+  /**
    * Custom render function for the component
    * Receives isRecording state and control functions
    */
@@ -97,38 +111,85 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
   locale = 'en-US',
   autoStart = false,
   enablePartialResults = true,
+  continuous = false,
+  maxSilenceDuration = 5000,
   children,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recognizedText, setRecognizedText] = useState('');
   const [partialText, setPartialText] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [shouldContinue, setShouldContinue] = useState(false);
+  const silenceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Clear any existing timers on cleanup
+    return () => {
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // Set up event listeners
     Voice.onSpeechStart = () => {
       setIsRecording(true);
       setError(null);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+      }
       onStart?.();
     };
 
-    Voice.onSpeechEnd = () => {
+    Voice.onSpeechEnd = async () => {
       setIsRecording(false);
-      onStop?.();
+
+      // In continuous mode, restart listening after results
+      if (continuous && shouldContinue) {
+        // Small delay before restarting
+        setTimeout(async () => {
+          if (shouldContinue) {
+            try {
+              await Voice.start(locale, {
+                EXTRA_PARTIAL_RESULTS: enablePartialResults,
+              });
+            } catch (err) {
+              console.error('Failed to restart voice recognition:', err);
+            }
+          }
+        }, 100);
+      } else {
+        onStop?.();
+      }
     };
 
     Voice.onSpeechError = (e: SpeechErrorEvent) => {
       const errorMessage = e.error?.message || 'Unknown error';
       setError(errorMessage);
       setIsRecording(false);
+      setShouldContinue(false);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+      }
       onError?.(errorMessage);
     };
 
     Voice.onSpeechResults = (e: SpeechResultsEvent) => {
       if (e.value && e.value.length > 0) {
         const text = e.value[0];
-        setRecognizedText(text);
-        onSpeechResult?.(text);
+
+        // In continuous mode, append new text to existing
+        if (continuous && recognizedText) {
+          const updatedText = recognizedText + ' ' + text;
+          setRecognizedText(updatedText);
+          onSpeechResult?.(updatedText);
+        } else {
+          setRecognizedText(text);
+          onSpeechResult?.(text);
+        }
+
+        setPartialText('');
       }
     };
 
@@ -138,6 +199,16 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
           const text = e.value[0];
           setPartialText(text);
           onPartialResult?.(text);
+
+          // Reset silence timer on partial results (user is speaking)
+          if (continuous && silenceTimerRef.current) {
+            clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = setTimeout(() => {
+              if (shouldContinue) {
+                stop();
+              }
+            }, maxSilenceDuration);
+          }
         }
       };
     }
@@ -153,6 +224,11 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
     onStop,
     onError,
     enablePartialResults,
+    continuous,
+    shouldContinue,
+    recognizedText,
+    locale,
+    maxSilenceDuration,
   ]);
 
   // Auto-start if enabled
@@ -166,8 +242,11 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
   const start = useCallback(async () => {
     try {
       setError(null);
-      setRecognizedText('');
-      setPartialText('');
+      if (!continuous) {
+        setRecognizedText('');
+        setPartialText('');
+      }
+      setShouldContinue(true);
 
       // Check permission (Android only)
       const hasPermission = await Voice.checkMicrophonePermission();
@@ -182,27 +261,55 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
       await Voice.start(locale, {
         EXTRA_PARTIAL_RESULTS: enablePartialResults,
       });
+
+      // Start silence timer if in continuous mode
+      if (continuous) {
+        silenceTimerRef.current = setTimeout(() => {
+          if (shouldContinue) {
+            stop();
+          }
+        }, maxSilenceDuration);
+      }
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : 'Failed to start recording';
       setError(errorMessage);
+      setShouldContinue(false);
       onError?.(errorMessage);
     }
-  }, [locale, enablePartialResults, onError]);
+  }, [
+    locale,
+    enablePartialResults,
+    onError,
+    continuous,
+    maxSilenceDuration,
+    shouldContinue,
+  ]);
 
   const stop = useCallback(async () => {
     try {
+      setShouldContinue(false);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
+      }
       await Voice.stop();
+      onStop?.();
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : 'Failed to stop recording';
       setError(errorMessage);
       onError?.(errorMessage);
     }
-  }, [onError]);
+  }, [onError, onStop]);
 
   const cancel = useCallback(async () => {
     try {
+      setShouldContinue(false);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
+      }
       await Voice.cancel();
       setRecognizedText('');
       setPartialText('');

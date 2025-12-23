@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Voice from '../index';
 import type { SpeechErrorEvent, SpeechResultsEvent } from '../VoiceModuleTypes';
 
@@ -14,6 +14,20 @@ export interface UseVoiceRecognitionOptions {
    * @default true
    */
   enablePartialResults?: boolean;
+
+  /**
+   * Whether to continue listening after getting results (continuous mode)
+   * When enabled, the microphone will automatically restart after getting results
+   * @default false
+   */
+  continuous?: boolean;
+
+  /**
+   * Maximum silence duration in milliseconds before stopping (continuous mode)
+   * Only applies when continuous mode is enabled
+   * @default 5000 (5 seconds)
+   */
+  maxSilenceDuration?: number;
 
   /**
    * Callback fired when speech is recognized
@@ -95,6 +109,8 @@ export const useVoiceRecognition = (
   const {
     locale = 'en-US',
     enablePartialResults = true,
+    continuous = false,
+    maxSilenceDuration = 5000,
     onResult,
     onError,
   } = options;
@@ -103,31 +119,75 @@ export const useVoiceRecognition = (
   const [results, setResults] = useState<string[]>([]);
   const [partialResults, setPartialResults] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [shouldContinue, setShouldContinue] = useState(false);
+  const silenceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const accumulatedTextRef = React.useRef<string>('');
+
+  useEffect(() => {
+    // Clear any existing timers on cleanup
+    return () => {
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // Set up event listeners
     Voice.onSpeechStart = () => {
       setIsRecording(true);
       setError(null);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+      }
     };
 
-    Voice.onSpeechEnd = () => {
+    Voice.onSpeechEnd = async () => {
       setIsRecording(false);
+
+      // In continuous mode, restart listening after results
+      if (continuous && shouldContinue) {
+        setTimeout(async () => {
+          if (shouldContinue) {
+            try {
+              await Voice.start(locale, {
+                EXTRA_PARTIAL_RESULTS: enablePartialResults,
+              });
+            } catch (err) {
+              console.error('Failed to restart voice recognition:', err);
+            }
+          }
+        }, 100);
+      }
     };
 
     Voice.onSpeechError = (e: SpeechErrorEvent) => {
       const errorMessage = e.error?.message || 'Unknown error';
       setError(errorMessage);
       setIsRecording(false);
+      setShouldContinue(false);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+      }
       onError?.(errorMessage);
     };
 
     Voice.onSpeechResults = (e: SpeechResultsEvent) => {
       if (e.value && e.value.length > 0) {
-        setResults(e.value);
-        const firstResult = e.value[0];
-        if (firstResult) {
-          onResult?.(firstResult);
+        if (continuous) {
+          // Append new text to accumulated text
+          const newText = e.value[0];
+          accumulatedTextRef.current = accumulatedTextRef.current
+            ? accumulatedTextRef.current + ' ' + newText
+            : newText;
+          setResults([accumulatedTextRef.current, ...e.value.slice(1)]);
+          onResult?.(accumulatedTextRef.current);
+        } else {
+          setResults(e.value);
+          const firstResult = e.value[0];
+          if (firstResult) {
+            onResult?.(firstResult);
+          }
         }
       }
     };
@@ -136,6 +196,16 @@ export const useVoiceRecognition = (
       Voice.onSpeechPartialResults = (e: SpeechResultsEvent) => {
         if (e.value && e.value.length > 0) {
           setPartialResults(e.value);
+
+          // Reset silence timer on partial results (user is speaking)
+          if (continuous && silenceTimerRef.current) {
+            clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = setTimeout(() => {
+              if (shouldContinue) {
+                stop();
+              }
+            }, maxSilenceDuration);
+          }
         }
       };
     }
@@ -144,13 +214,25 @@ export const useVoiceRecognition = (
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
-  }, [enablePartialResults, onResult, onError]);
+  }, [
+    enablePartialResults,
+    onResult,
+    onError,
+    continuous,
+    shouldContinue,
+    locale,
+    maxSilenceDuration,
+  ]);
 
   const start = useCallback(async () => {
     try {
       setError(null);
-      setResults([]);
-      setPartialResults([]);
+      if (!continuous) {
+        setResults([]);
+        setPartialResults([]);
+        accumulatedTextRef.current = '';
+      }
+      setShouldContinue(true);
 
       // Check permission (Android only)
       const hasPermission = await Voice.checkMicrophonePermission();
@@ -165,16 +247,38 @@ export const useVoiceRecognition = (
       await Voice.start(locale, {
         EXTRA_PARTIAL_RESULTS: enablePartialResults,
       });
+
+      // Start silence timer if in continuous mode
+      if (continuous) {
+        silenceTimerRef.current = setTimeout(() => {
+          if (shouldContinue) {
+            stop();
+          }
+        }, maxSilenceDuration);
+      }
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : 'Failed to start recording';
       setError(errorMessage);
+      setShouldContinue(false);
       onError?.(errorMessage);
     }
-  }, [locale, enablePartialResults, onError]);
+  }, [
+    locale,
+    enablePartialResults,
+    onError,
+    continuous,
+    maxSilenceDuration,
+    shouldContinue,
+  ]);
 
   const stop = useCallback(async () => {
     try {
+      setShouldContinue(false);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
+      }
       await Voice.stop();
     } catch (e) {
       const errorMessage =
@@ -186,9 +290,15 @@ export const useVoiceRecognition = (
 
   const cancel = useCallback(async () => {
     try {
+      setShouldContinue(false);
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
+      }
       await Voice.cancel();
       setResults([]);
       setPartialResults([]);
+      accumulatedTextRef.current = '';
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : 'Failed to cancel recording';
@@ -202,6 +312,12 @@ export const useVoiceRecognition = (
     setPartialResults([]);
     setError(null);
     setIsRecording(false);
+    accumulatedTextRef.current = '';
+    setShouldContinue(false);
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
   }, []);
 
   return {

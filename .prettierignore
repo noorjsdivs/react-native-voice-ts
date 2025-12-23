@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+.yarn/
+
+# build outputs
+dist/
+build/
+*.log
+
+# native
+android/
+ios/
+*.xcodeproj
+*.xcworkspace
+*.pbxproj
+Pods/
+
+# misc
+.DS_Store
+.env
+.env.*
+coverage/
+.vscode/
+.idea/
+
+# generated
+*.d.ts.map

@@ -2,6 +2,7 @@ import {
   NativeModules,
   NativeEventEmitter,
   Platform,
+  PermissionsAndroid,
   type EventSubscription,
 } from 'react-native';
 import invariant from 'invariant';
@@ -21,12 +22,12 @@ import {
 } from './VoiceModuleTypes';
 
 const LINKING_ERROR =
-  `The package '@react-native-voice/voice' doesn't seem to be linked. Make sure: \n\n` +
+  `The package 'react-native-voice-ts' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-//@ts-expect-error
+// @ts-ignore - turboModuleProxy is not in React Native types
 const isTurboModuleEnabled = global.__turboModuleProxy != null;
 
 const VoiceNativeModule = isTurboModuleEnabled
@@ -56,10 +57,18 @@ class RCTVoice {
   private _loaded: boolean;
   private _listeners: EventSubscription[];
   private _events: Required<SpeechEvents> & Required<TranscriptionEvents>;
+  private _isRecognizing: boolean;
+  private _debounceTimeout: NodeJS.Timeout | null;
+  private _lastResults: string[];
+  private _recognitionStartTime: number;
 
   constructor() {
     this._loaded = false;
-    this._listeners = JSON.parse(JSON.stringify([]));
+    this._listeners = [];
+    this._isRecognizing = false;
+    this._debounceTimeout = null;
+    this._lastResults = [];
+    this._recognitionStartTime = 0;
     this._events = {
       onSpeechStart: () => {},
       onSpeechRecognized: () => {},
@@ -76,15 +85,20 @@ class RCTVoice {
   }
 
   removeAllListeners() {
-    if (this._listeners) {
+    if (this._listeners && this._listeners.length > 0) {
       this._listeners.forEach((listener) => {
         if (listener?.remove) {
-          listener?.remove();
+          listener.remove();
         }
       });
-
-      this._listeners = JSON.parse(JSON.stringify([]));
+      this._listeners = [];
     }
+    if (this._debounceTimeout) {
+      clearTimeout(this._debounceTimeout);
+      this._debounceTimeout = null;
+    }
+    this._isRecognizing = false;
+    this._lastResults = [];
   }
 
   destroy() {
@@ -97,6 +111,7 @@ class RCTVoice {
           reject(new Error(error));
         } else {
           this.removeAllListeners();
+          this._loaded = false;
           resolve();
         }
       });
@@ -113,8 +128,9 @@ class RCTVoice {
         } else {
           if (this._listeners?.length > 0) {
             this._listeners.forEach((listener) => listener.remove());
-            this._listeners = JSON.parse(JSON.stringify([]));
+            this._listeners = [];
           }
+          this._loaded = false;
           resolve();
         }
       });
@@ -132,9 +148,14 @@ class RCTVoice {
       );
     }
 
+    this._recognitionStartTime = Date.now();
+    this._isRecognizing = true;
+
     return new Promise<void>((resolve, reject) => {
       const callback = (error: string) => {
         if (error) {
+          this._isRecognizing = false;
+          this._recognitionStartTime = 0;
           reject(new Error(error));
         } else {
           resolve();
@@ -199,6 +220,7 @@ class RCTVoice {
     if (!this._loaded && !this._listeners) {
       return Promise.resolve();
     }
+    this._isRecognizing = false;
     return new Promise<void>((resolve, reject) => {
       Voice.stopSpeech((error?: string) => {
         if (error) {
@@ -280,12 +302,126 @@ class RCTVoice {
 
   isRecognizing(): Promise<0 | 1> {
     return new Promise((resolve) => {
-      Voice.isRecognizing((isRecognizing: 0 | 1) => resolve(isRecognizing));
+      Voice.isRecognizing((isRecognizing: 0 | 1) => {
+        this._isRecognizing = isRecognizing === 1;
+        resolve(isRecognizing);
+      });
     });
   }
 
+  /**
+   * Check if speech recognition is currently in progress (synchronous)
+   */
+  get recognizing(): boolean {
+    return this._isRecognizing;
+  }
+
+  /**
+   * Get the last recognition results without triggering a new recognition
+   */
+  getLastResults(): string[] {
+    return [...this._lastResults];
+  }
+
+  /**
+   * Get recognition duration in milliseconds
+   */
+  getRecognitionDuration(): number {
+    if (this._recognitionStartTime === 0) return 0;
+    return Date.now() - this._recognitionStartTime;
+  }
+
+  /**
+   * Request microphone permission (Android)
+   */
+  async requestMicrophonePermission(): Promise<boolean> {
+    if (Platform.OS !== 'android') {
+      return true; // iOS handles permissions automatically
+    }
+
+    try {
+      const permission = PermissionsAndroid.PERMISSIONS.RECORD_AUDIO;
+      if (!permission) {
+        return false;
+      }
+      const granted = await PermissionsAndroid.request(permission, {
+        title: 'Microphone Permission',
+        message:
+          'This app needs access to your microphone for voice recognition',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      });
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn('Error requesting microphone permission:', err);
+      return false;
+    }
+  }
+
+  /**
+   * Check microphone permission status (Android)
+   */
+  async checkMicrophonePermission(): Promise<boolean> {
+    if (Platform.OS !== 'android') {
+      return true;
+    }
+
+    try {
+      const permission = PermissionsAndroid.PERMISSIONS.RECORD_AUDIO;
+      if (!permission) {
+        return false;
+      }
+      const granted = await PermissionsAndroid.check(permission);
+      return granted;
+    } catch (err) {
+      console.warn('Error checking microphone permission:', err);
+      return false;
+    }
+  }
+
+  /**
+   * Get supported languages for speech recognition
+   */
+  async getSupportedLanguages(): Promise<string[]> {
+    try {
+      if (Platform.OS === 'android') {
+        // Android implementation would need native support
+        return [];
+      }
+      // iOS implementation would need native support
+      return [];
+    } catch (error) {
+      console.warn('Error getting supported languages:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Debounce results to avoid excessive updates
+   * Reserved for future use
+   * @private
+   */
+  private debounceResults(
+    callback: (results: string[]) => void,
+    results: string[],
+    delay: number = 300,
+  ): void {
+    if (this._debounceTimeout) {
+      clearTimeout(this._debounceTimeout);
+    }
+    this._debounceTimeout = setTimeout(() => {
+      callback(results);
+      this._debounceTimeout = null;
+    }, delay);
+  }
+
   set onSpeechStart(fn: (e: SpeechStartEvent) => void) {
-    this._events.onSpeechStart = fn;
+    this._events.onSpeechStart = (e: SpeechStartEvent) => {
+      this._recognitionStartTime = Date.now();
+      this._isRecognizing = true;
+      fn(e);
+    };
   }
 
   set onTranscriptionStart(fn: (e: TranscriptionStartEvent) => void) {
@@ -297,14 +433,20 @@ class RCTVoice {
   }
 
   set onSpeechEnd(fn: (e: SpeechEndEvent) => void) {
-    this._events.onSpeechEnd = fn;
+    this._events.onSpeechEnd = (e: SpeechEndEvent) => {
+      this._isRecognizing = false;
+      fn(e);
+    };
   }
 
   set onTranscriptionEnd(fn: (e: SpeechEndEvent) => void) {
     this._events.onTranscriptionEnd = fn;
   }
   set onSpeechError(fn: (e: SpeechErrorEvent) => void) {
-    this._events.onSpeechError = fn;
+    this._events.onSpeechError = (e: SpeechErrorEvent) => {
+      this._isRecognizing = false;
+      fn(e);
+    };
   }
 
   set onTranscriptionError(fn: (e: TranscriptionErrorEvent) => void) {
@@ -312,7 +454,13 @@ class RCTVoice {
   }
 
   set onSpeechResults(fn: (e: SpeechResultsEvent) => void) {
-    this._events.onSpeechResults = fn;
+    this._events.onSpeechResults = (e: SpeechResultsEvent) => {
+      if (e.value) {
+        this._lastResults = e.value;
+      }
+      this._isRecognizing = false;
+      fn(e);
+    };
   }
 
   set onTranscriptionResults(fn: (e: TranscriptionResultsEvent) => void) {
@@ -341,4 +489,12 @@ export type {
   TranscriptionStartEvent,
   TranscriptionResultsEvent,
 };
+
+export type {
+  VoiceOptions,
+  RecognitionStats,
+  PermissionResult,
+  Language,
+} from './VoiceUtilTypes';
+
 export default new RCTVoice();

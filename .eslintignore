@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+coverage/
+android/
+ios/
+example/
+*.d.ts
+*.config.js
+.eslintrc.js

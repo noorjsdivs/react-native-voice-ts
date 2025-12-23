@@ -1,28 +1,43 @@
 {
-  "name": "@react-native-voice/voice",
+  "name": "react-native-voice-ts",
   "description": "React Native Native Voice library for iOS and Android",
   "version": "3.2.4",
   "author": "Noor Mohammad <noor.jsdivs@gmail.com>",
   "private": false,
-  "homepage": "https://github.com/react-native-voice/voice",
+  "homepage": "https://github.com/noorjsdivs/react-native-voice-ts",
   "devDependencies": {
     "@react-native-community/eslint-config": "^3.2.0",
     "@semantic-release/git": "^10.0.1",
     "@types/invariant": "^2.2.37",
+    "@types/node": "^25.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
     "eslint": "9.39.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-native": "^5.0.0",
     "expo-module-scripts": "^5.0.8",
     "lint-staged": "^16.2.7",
-    "react": "18.3.1",
+    "prettier": "^3.7.4",
+    "react": "^19.0.0",
     "react-native": "^0.76.9",
     "semantic-release": "^25.0.2",
     "typescript": "5.9.3"
   },
   "keywords": [
+    "react-native",
+    "voice",
+    "speech",
+    "speech-to-text",
+    "voice-recognition",
+    "speech-recognition",
+    "stt",
     "android",
     "ios",
-    "react-native",
-    "speech",
-    "voice"
+    "typescript",
+    "microphone",
+    "audio",
+    "transcription"
   ],
   "license": "MIT",
   "source": "src/index.ts",
@@ -30,6 +45,7 @@
   "types": "dist/index.d.ts",
   "peerDependencies": {
     "expo": ">=48.0.0",
+    "react": ">=18.0.0",
     "react-native": ">=0.71.0"
   },
   "peerDependenciesMeta": {
@@ -39,7 +55,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/react-native-voice/voice.git"
+    "url": "https://github.com/noorjsdivs/react-native-voice-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/noorjsdivs/react-native-voice-ts/issues"
   },
   "files": [
     "src",
@@ -51,17 +70,26 @@
     "plugin"
   ],
   "scripts": {
-    "lint": "eslint src/*",
+    "lint": "eslint src/* --fix",
+    "lint:check": "eslint src/*",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "semantic-release": "semantic-release",
     "start": "yarn --cwd example start",
     "ios": "yarn --cwd example ios",
     "android": "yarn --cwd example android",
     "prepare": "yarn build && yarn build:plugin",
     "build": "tsc",
-    "dev-sync": "cp -r ./dist example/node_modules/@react-native-voice/voice",
-    "type-check": "tsc -noEmit",
+    "build:watch": "tsc --watch",
+    "dev-sync": "cp -r ./dist example/node_modules/react-native-voice-ts",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
     "build:plugin": "tsc --build plugin",
-    "lint:plugin": "eslint plugin/src/*"
+    "lint:plugin": "eslint plugin/src/* --fix",
+    "clean": "rm -rf dist && rm -rf plugin/build",
+    "prepack": "yarn clean && yarn build && yarn build:plugin",
+    "test": "jest",
+    "validate": "yarn type-check && yarn lint:check && yarn format:check"
   },
   "dependencies": {
     "invariant": "^2.2.4"

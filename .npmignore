@@ -1,1 +1,55 @@
+# Development files
+.eslintrc.js
+.eslintignore
+.prettierrc.js
+.prettierignore
+eslint.config.js
+tsconfig.json
+*.log
+*.swp
+*.swo
+.DS_Store
+.vscode/
+.idea/
+
+# Source files (only dist/ is needed)
+src/
+plugin/src/
+
+# Test files
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
 VoiceTest
+
+# Example app
+example/
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+circle.yml
+
+# Documentation (include only essential ones)
+CHANGELOG_NEW.md
+OPTIMIZATION_SUMMARY.md
+QUICK_REFERENCE.md
+
+# Build artifacts
+*.tgz
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Misc
+*.orig
+.npmrc

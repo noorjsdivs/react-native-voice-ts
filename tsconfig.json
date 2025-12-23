@@ -1,28 +1,55 @@
 {
-  "extends": "expo-module-scripts/tsconfig.base",
   "compilerOptions": {
-    "declaration": true /* Generates corresponding '.d.ts' file. */,
-    "declarationMap": true /* Generates a sourcemap for each corresponding '.d.ts' file. */,
-    "outDir": "./dist" /* Redirect output structure to the directory. */,
-    "rootDir": "./src" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
-    /* Strict Type-Checking Options */
+    /* Language and Environment */
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react-native",
+
+    /* Modules */
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    /* Emit */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noEmit": false,
+    "removeComments": false,
+
+    /* Interop Constraints */
+    "isolatedModules": true,
+    "allowJs": false,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": false,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noImplicitUseStrict": false,
-    "noStrictGenericChecks": false,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "resolveJsonModule": true,
+
+    /* Completeness */
     "skipLibCheck": true,
-    "strict": true,
-    "verbatimModuleSyntax": true,
-    "noImplicitAny": false
+
+    /* Advanced */
+    "types": ["node"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "example", "android", "ios"]
 }

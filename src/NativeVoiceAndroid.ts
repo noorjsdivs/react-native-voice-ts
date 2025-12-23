@@ -12,12 +12,12 @@ export interface Spec extends TurboModule {
   startSpeech: (
     locale: string,
     opts: SpeechType,
-    callback: (error: string) => void
+    callback: (error: string) => void,
   ) => void;
   stopSpeech: (callback: (error: string) => void) => void;
   cancelSpeech: (callback: (error: string) => void) => void;
   isSpeechAvailable: (
-    callback: (isAvailable: boolean, error: string) => void
+    callback: (isAvailable: boolean, error: string) => void,
   ) => void;
   getSpeechRecognitionServices(): Promise<string[]>;
   isRecognizing: (callback: (Recognizing: boolean) => void) => void;

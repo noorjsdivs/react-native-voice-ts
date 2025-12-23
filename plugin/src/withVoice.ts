@@ -5,7 +5,7 @@ import {
   withInfoPlist,
 } from '@expo/config-plugins';
 
-const pkg = require('@react-native-voice/voice/package.json');
+const pkg = require('react-native-voice-ts/package.json');
 
 const MICROPHONE = 'Allow $(PRODUCT_NAME) to access the microphone';
 
@@ -35,7 +35,7 @@ const withIosPermissions: ConfigPlugin<Props> = (
   c,
   { microphonePermission, speechRecognitionPermission } = {},
 ) => {
-  return withInfoPlist(c, config => {
+  return withInfoPlist(c, (config) => {
     if (microphonePermission !== false) {
       config.modResults.NSMicrophoneUsageDescription =
         microphonePermission ||
@@ -56,7 +56,7 @@ const withIosPermissions: ConfigPlugin<Props> = (
 /**
  * Adds the following to the `AndroidManifest.xml`: `<uses-permission android:name="android.permission.RECORD_AUDIO" />`
  */
-const withAndroidPermissions: ConfigPlugin = config => {
+const withAndroidPermissions: ConfigPlugin = (config) => {
   return AndroidConfig.Permissions.withPermissions(config, [
     'android.permission.RECORD_AUDIO',
   ]);

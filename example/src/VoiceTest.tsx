@@ -1,17 +1,11 @@
-import { Component } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableHighlight,
-} from 'react-native';
+import {Component} from 'react';
+import {StyleSheet, Text, View, Image, TouchableHighlight} from 'react-native';
 
 import Voice, {
   type SpeechRecognizedEvent,
   type SpeechResultsEvent,
   type SpeechErrorEvent,
-} from '@react-native-voice/voice';
+} from 'react-native-voice-ts';
 
 type Props = {};
 type State = {

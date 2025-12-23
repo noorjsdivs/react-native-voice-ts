@@ -55,20 +55,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/noorjsdivs/react-native-voice-ts.git"
+    "url": "git+https://github.com/noorjsdivs/react-native-voice-ts.git"
   },
   "bugs": {
     "url": "https://github.com/noorjsdivs/react-native-voice-ts/issues"
   },
-  "files": [
-    "src",
-    "dist",
-    "android",
-    "ios",
-    "react-native-voice.podspec",
-    "app.plugin.js",
-    "plugin"
-  ],
+
   "scripts": {
     "lint": "eslint src/* --fix",
     "lint:check": "eslint src/*",

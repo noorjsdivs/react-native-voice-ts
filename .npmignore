@@ -12,8 +12,12 @@ tsconfig.json
 .vscode/
 .idea/
 
+# Xcode user data
+**/*.xcuserdata
+**/*.xcuserstate
+
 # Source files (only dist/ is needed)
-src/
+
 plugin/src/
 
 # Test files
@@ -53,3 +57,5 @@ lerna-debug.log*
 # Misc
 *.orig
 .npmrc
+node_modules
+

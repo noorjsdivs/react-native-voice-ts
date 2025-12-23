@@ -1,7 +1,7 @@
 {
   "name": "react-native-voice-ts",
   "description": "React Native Native Voice library for iOS and Android",
-  "version": "3.2.4",
+  "version": "1.0.0",
   "author": "Noor Mohammad <noor.jsdivs@gmail.com>",
   "private": false,
   "homepage": "https://github.com/noorjsdivs/react-native-voice-ts",
@@ -19,8 +19,8 @@
     "expo-module-scripts": "^5.0.8",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
-    "react": "^19.0.0",
-    "react-native": "^0.76.9",
+    "react": "^19.2.1",
+    "react-native": "^0.83.0",
     "semantic-release": "^25.0.2",
     "typescript": "5.9.3"
   },

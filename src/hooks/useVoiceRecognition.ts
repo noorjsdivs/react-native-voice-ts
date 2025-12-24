@@ -35,9 +35,34 @@ export interface UseVoiceRecognitionOptions {
   onResult?: (text: string) => void;
 
   /**
+   * Callback fired when partial results are available (real-time)
+   */
+  onPartialResult?: (text: string) => void;
+
+  /**
    * Callback fired when an error occurs
    */
   onError?: (error: string) => void;
+
+  /**
+   * Callback fired when recording starts
+   */
+  onStart?: () => void;
+
+  /**
+   * Callback fired when recording ends
+   */
+  onEnd?: () => void;
+
+  /**
+   * Callback fired when speech is recognized (before results)
+   */
+  onRecognized?: () => void;
+
+  /**
+   * Callback fired when volume changes (0-10)
+   */
+  onVolumeChanged?: (value: number) => void;
 }
 
 export interface UseVoiceRecognitionReturn {
@@ -112,7 +137,12 @@ export const useVoiceRecognition = (
     continuous = false,
     maxSilenceDuration = 5000,
     onResult,
+    onPartialResult,
     onError,
+    onStart,
+    onEnd,
+    onRecognized,
+    onVolumeChanged,
   } = options;
 
   const [isRecording, setIsRecording] = useState(false);
@@ -140,10 +170,12 @@ export const useVoiceRecognition = (
       if (silenceTimerRef.current) {
         clearTimeout(silenceTimerRef.current);
       }
+      onStart?.();
     };
 
     Voice.onSpeechEnd = async () => {
       setIsRecording(false);
+      onEnd?.();
 
       // In continuous mode, restart listening after results
       if (continuous && shouldContinueRef.current) {
@@ -159,6 +191,10 @@ export const useVoiceRecognition = (
           }
         }, 100);
       }
+    };
+
+    Voice.onSpeechRecognized = () => {
+      onRecognized?.();
     };
 
     Voice.onSpeechError = (e: SpeechErrorEvent) => {
@@ -192,28 +228,36 @@ export const useVoiceRecognition = (
       }
     };
 
-    if (enablePartialResults) {
-      Voice.onSpeechPartialResults = (e: SpeechResultsEvent) => {
-        if (e.value && e.value.length > 0) {
-          setPartialResults(e.value);
-
-          // Reset silence timer on partial results (user is speaking)
-          if (continuous && silenceTimerRef.current) {
-            clearTimeout(silenceTimerRef.current);
-            silenceTimerRef.current = setTimeout(async () => {
-              if (shouldContinueRef.current) {
-                shouldContinueRef.current = false;
-                if (silenceTimerRef.current) {
-                  clearTimeout(silenceTimerRef.current);
-                  silenceTimerRef.current = null;
-                }
-                await Voice.stop();
-              }
-            }, maxSilenceDuration);
-          }
+    Voice.onSpeechPartialResults = (e: SpeechResultsEvent) => {
+      if (e.value && e.value.length > 0) {
+        setPartialResults(e.value);
+        const firstPartial = e.value[0];
+        if (firstPartial) {
+          onPartialResult?.(firstPartial);
         }
-      };
-    }
+
+        // Reset silence timer on partial results (user is speaking)
+        if (continuous && silenceTimerRef.current) {
+          clearTimeout(silenceTimerRef.current);
+          silenceTimerRef.current = setTimeout(async () => {
+            if (shouldContinueRef.current) {
+              shouldContinueRef.current = false;
+              if (silenceTimerRef.current) {
+                clearTimeout(silenceTimerRef.current);
+                silenceTimerRef.current = null;
+              }
+              await Voice.stop();
+            }
+          }, maxSilenceDuration);
+        }
+      }
+    };
+
+    Voice.onSpeechVolumeChanged = (e: any) => {
+      if (e.value !== undefined) {
+        onVolumeChanged?.(e.value);
+      }
+    };
 
     // Cleanup
     return () => {
@@ -222,7 +266,12 @@ export const useVoiceRecognition = (
   }, [
     enablePartialResults,
     onResult,
+    onPartialResult,
     onError,
+    onStart,
+    onEnd,
+    onRecognized,
+    onVolumeChanged,
     continuous,
     locale,
     maxSilenceDuration,

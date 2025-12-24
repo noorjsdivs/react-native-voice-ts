@@ -75,6 +75,12 @@ npm install react-native-voice-ts --save
 yarn add react-native-voice-ts
 ```
 
+### Using pnpm
+
+```bash
+pnpm add react-native-voice-ts
+```
+
 ### iOS Setup
 
 ```bash
@@ -105,13 +111,13 @@ cd ios && pod install && cd ..
 ### Three Ways to Use
 
 ```typescript
-// 1. Ready-to-use Component (Easiest)
+// 1. Ready-to-use Component (Easiest - New in 2025)
 import { VoiceMicrophone } from 'react-native-voice-ts';
 
-// 2. Custom Hook (More control)
+// 2. Custom Hook (More control - New in 2025)
 import { useVoiceRecognition } from 'react-native-voice-ts';
 
-// 3. Core API (Advanced)
+// 3. Core API (Advanced - Fully backward compatible)
 import Voice from 'react-native-voice-ts';
 
 // 4. Import SVG Icons (Optional - for custom UI)
@@ -215,6 +221,218 @@ const styles = StyleSheet.create({
 
 ---
 
+## 🎨 Built-in Icon Variants
+
+The library includes **3 microphone icon variants**, each with on/off states (6 icons total):
+
+### **Variant 1: Standard Outline** (Default)
+
+Classic microphone with clean outline design.
+
+```tsx
+import { MicIcon, MicOffIcon } from 'react-native-voice-ts';
+
+// Active state
+<MicIcon size={24} color="#007AFF" strokeWidth={2} />
+
+// Muted/Off state
+<MicOffIcon size={24} color="#FF3B30" strokeWidth={2} />
+```
+
+**SVG Preview:**
+
+<div style="display: flex; gap: 40px; align-items: center; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+  <div style="text-align: center;">
+    <div><strong>Active</strong></div>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="22"/>
+    </svg>
+  </div>
+  <div style="text-align: center;">
+    <div><strong>Muted</strong></div>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="2" y1="2" x2="22" y2="22"/>
+      <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/>
+      <path d="M5 10v2a7 7 0 0 0 12 5"/>
+      <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/>
+      <path d="M9 9v3a3 3 0 0 0 5.12 2.12"/>
+      <line x1="12" y1="19" x2="12" y2="22"/>
+    </svg>
+  </div>
+</div>
+
+### **Variant 2: Filled Microphone**
+
+Bold filled microphone for emphasis and better visibility.
+
+```tsx
+import { MicIconFilled, MicOffIconFilled } from 'react-native-voice-ts';
+
+// Active filled state
+<MicIconFilled size={24} color="#007AFF" strokeWidth={2} />
+
+// Muted filled state
+<MicOffIconFilled size={24} color="#FF3B30" strokeWidth={2} />
+```
+
+**SVG Preview:**
+
+```
+Active:  ⎪█⎥  (Solid filled microphone)
+Muted:   ⎪/█⎥ (Filled microphone with mute indicator)
+```
+
+<div style="display: flex; gap: 40px; align-items: center; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+  <div style="text-align: center;">
+    <div><strong>Active</strong></div>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="22"/>
+      <path d="M20 7v10" opacity="0.5"/>
+      <path d="M23 9v6" opacity="0.3"/>
+      <path d="M4 7v10" opacity="0.5"/>
+      <path d="M1 9v6" opacity="0.3"/>
+    </svg>
+  </div>
+  <div style="text-align: center;">
+    <div><strong>Muted</strong></div>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="2" y1="2" x2="22" y2="22" stroke="#FF3B30"/>
+      <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/>
+      <path d="M5 10v2a7 7 0 0 0 12 5"/>
+      <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/>
+      <path d="M9 9v3a3 3 0 0 0 5.12 2.12"/>
+      <line x1="12" y1="19" x2="12" y2="22"/>
+      <path d="M20 7v4" opacity="0.2" stroke-dasharray="2,2"/>
+      <path d="M4 7v4" opacity="0.2" stroke-dasharray="2,2"/>
+    </svg>
+  </div>
+</div>
+
+### **Variant 3: Microphone with Sound Waves**
+
+Dynamic microphone with sound wave indicators - perfect for showing active recording.
+
+```tsx
+import { MicIconWave, MicOffIconWave } from 'react-native-voice-ts';
+
+// Active with waves
+<MicIconWave size={24} color="#007AFF" strokeWidth={2} />
+
+// Muted with disabled waves
+<MicOffIconWave size={24} color="#999" strokeWidth={2} />
+```
+
+**SVG Preview:**
+
+```
+Active:  ⎟⎪ ⎥⎟  (Microphone with animated sound waves)
+Muted:   ⎟⎪/⎥⎟ (Microphone with muted/dashed waves)
+```
+
+### **Complete Icon Usage Example**
+
+```tsx
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import {
+  VoiceMicrophone,
+  MicIcon,
+  MicOffIcon,
+  MicIconFilled,
+  MicOffIconFilled,
+  MicIconWave,
+  MicOffIconWave,
+} from 'react-native-voice-ts';
+
+export default function IconVariantsDemo() {
+  const [variant, setVariant] = useState<'standard' | 'filled' | 'wave'>(
+    'standard',
+  );
+
+  const getIcons = () => {
+    switch (variant) {
+      case 'filled':
+        return { ActiveIcon: MicIconFilled, MutedIcon: MicOffIconFilled };
+      case 'wave':
+        return { ActiveIcon: MicIconWave, MutedIcon: MicOffIconWave };
+      default:
+        return { ActiveIcon: MicIcon, MutedIcon: MicOffIcon };
+    }
+  };
+
+  const { ActiveIcon, MutedIcon } = getIcons();
+
+  return (
+    <View style={styles.container}>
+      {/* Icon Variant Selector */}
+      <View style={styles.selector}>
+        <TouchableOpacity onPress={() => setVariant('standard')}>
+          <Text style={variant === 'standard' && styles.active}>Standard</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setVariant('filled')}>
+          <Text style={variant === 'filled' && styles.active}>Filled</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setVariant('wave')}>
+          <Text style={variant === 'wave' && styles.active}>Wave</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Voice Input with Selected Icon */}
+      <VoiceMicrophone>
+        {({ isRecording, start, stop }) => (
+          <TouchableOpacity
+            style={[styles.micButton, isRecording && styles.recording]}
+            onPress={isRecording ? stop : start}
+          >
+            {isRecording ? (
+              <MutedIcon size={32} color="#fff" strokeWidth={2} />
+            ) : (
+              <ActiveIcon size={32} color="#fff" strokeWidth={2} />
+            )}
+          </TouchableOpacity>
+        )}
+      </VoiceMicrophone>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { padding: 20, alignItems: 'center' },
+  selector: { flexDirection: 'row', gap: 15, marginBottom: 20 },
+  active: { fontWeight: 'bold', color: '#007AFF' },
+  micButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  recording: { backgroundColor: '#FF3B30' },
+});
+```
+
+### **Icon Props**
+
+All icons accept the same props:
+
+| Prop          | Type     | Default          | Description                  |
+| ------------- | -------- | ---------------- | ---------------------------- |
+| `size`        | `number` | `24`             | Icon size in pixels          |
+| `color`       | `string` | `'currentColor'` | Icon color (any valid color) |
+| `strokeWidth` | `number` | `2`              | Stroke width for outlines    |
+
+---
+
 ### 🎯 Using Hook (For More Control)
 
 ```tsx
@@ -242,6 +460,8 @@ export default function App() {
 ---
 
 ### 🔧 Advanced (Core API)
+
+For users who want full control or are migrating from previous versions:
 
 ```tsx
 import React, { useEffect, useState } from 'react';
@@ -785,81 +1005,12 @@ function HookExample() {
 - [VoiceSearchExample.tsx](./example/src/VoiceSearchExample.tsx) - Full search bar implementation
 - [VoiceHookExample.tsx](./example/src/VoiceHookExample.tsx) - Hook usage with advanced features
 - [COMPONENT_USAGE.md](./COMPONENT_USAGE.md) - Comprehensive component guide
-  style={[styles.button, isRecording && styles.recording]}
-  onPress={isRecording ? stop : start} >
-  <Text style={styles.buttonText}>
-  {isRecording ? '⏹ Stop' : '🎤 Start Recording'}
-  </Text>
-  </TouchableOpacity>
-  {error && <Text style={styles.error}>{error}</Text>}
-  </View>
-  )}
-  </VoiceMicrophone>
-  </View>
-  );
-  };
 
-const styles = StyleSheet.create({
-container: {
-flex: 1,
-padding: 20,
-backgroundColor: '#f5f5f5',
-justifyContent: 'center',
-},
-title: {
-fontSize: 24,
-fontWeight: 'bold',
-textAlign: 'center',
-marginBottom: 30,
-},
-textContainer: {
-backgroundColor: '#fff',
-padding: 20,
-borderRadius: 10,
-marginBottom: 30,
-elevation: 2,
-},
-label: {
-fontSize: 12,
-color: '#666',
-marginTop: 10,
-marginBottom: 5,
-fontWeight: '600',
-},
-liveText: {
-fontSize: 16,
-color: '#007AFF',
-fontStyle: 'italic',
-},
-finalText: {
-fontSize: 18,
-color: '#000',
-fontWeight: '500',
-},
-button: {
-backgroundColor: '#007AFF',
-padding: 15,
-borderRadius: 25,
-alignItems: 'center',
-},
-recording: {
-backgroundColor: '#FF3B30',
-},
-buttonText: {
-color: '#fff',
-fontSize: 18,
-fontWeight: 'bold',
-},
-error: {
-color: '#FF3B30',
-textAlign: 'center',
-marginTop: 10,
-},
-});
+---
 
-````
+## 💡 More Examples
 
-### Example 3: Multi-language Voice Input
+### Example 1: Simple Voice Search
 
 ```typescript
 import React, { useState } from 'react';
@@ -988,7 +1139,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-````
+```
 
 ### Example 4: Using Custom Hook with Form Input
 
@@ -1146,7 +1297,9 @@ const styles = StyleSheet.create({
 
 ```typescript
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { VoiceMicrophone } from 'react-native-voice-ts';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { VoiceMicrophone } from 'react-native-voice-ts';
 
 const VoiceCommands = () => {
@@ -1310,6 +1463,63 @@ const styles = StyleSheet.create({
 ✅ **Permission handling** - Built-in permission checks  
 ✅ **Type-safe** - Full TypeScript support  
 ✅ **Customizable** - Use your own UI with render props
+
+---
+
+## 🔄 Backward Compatibility
+
+**This library is fully backward compatible!** If you're upgrading from a previous version or the original `@react-native-voice/voice`, all your existing code will continue to work without any changes.
+
+### Core API (Always Supported)
+
+The core Voice API remains unchanged and fully supported:
+
+```tsx
+import Voice from 'react-native-voice-ts';
+
+// All these work exactly as before
+Voice.start('en-US');
+Voice.stop();
+Voice.cancel();
+Voice.destroy();
+Voice.isAvailable();
+Voice.onSpeechResults = (e) => console.log(e.value);
+```
+
+### What's New in v1.0+
+
+The new features are **additions** that don't break existing code:
+
+```tsx
+// ✅ NEW: Component (optional to use)
+import { VoiceMicrophone } from 'react-native-voice-ts';
+
+// ✅ NEW: Hook (optional to use)
+import { useVoiceRecognition } from 'react-native-voice-ts';
+
+// ✅ NEW: Icons (optional to use)
+import { MicIcon, MicOffIcon } from 'react-native-voice-ts';
+
+// ✅ Still works: Original API
+import Voice from 'react-native-voice-ts';
+```
+
+### Migration Guide
+
+**No migration needed!** But if you want to use the new features:
+
+```tsx
+// Before (still works)
+import Voice from 'react-native-voice-ts';
+Voice.onSpeechResults = (e) => setText(e.value[0]);
+Voice.start('en-US');
+
+// After (optional upgrade)
+import { useVoiceRecognition } from 'react-native-voice-ts';
+const { isRecording, results, start } = useVoiceRecognition({
+  onResult: setText,
+});
+```
 
 ---
 

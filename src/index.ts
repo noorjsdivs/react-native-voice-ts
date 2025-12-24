@@ -498,7 +498,15 @@ export type {
 } from './VoiceUtilTypes';
 
 // Export components
-export { VoiceMicrophone, MicIcon, MicOffIcon } from './components';
+export {
+  VoiceMicrophone,
+  MicIcon,
+  MicOffIcon,
+  MicIconFilled,
+  MicOffIconFilled,
+  MicIconWave,
+  MicOffIconWave,
+} from './components';
 export type {
   VoiceMicrophoneProps,
   MicIconProps,

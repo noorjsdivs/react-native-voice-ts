@@ -12,13 +12,17 @@ tsconfig.json
 .vscode/
 .idea/
 
-# Xcode user data
-**/*.xcuserdata
+# Xcode user data (76KB+ of unnecessary files)
+**/xcuserdata/**
 **/*.xcuserstate
+**/*.xcuserdata
 
 # Source files (only dist/ is needed)
-
+src/
 plugin/src/
+
+# Source maps (not needed in production)
+**/*.map
 
 # Test files
 __tests__/

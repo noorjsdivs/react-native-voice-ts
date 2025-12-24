@@ -1,6 +1,10 @@
 # macOS
 .DS_STORE
 
+# Xcode user-specific files
+**/xcuserdata/**
+**/*.xcuserstate
+
 node_modules
 *.class
 .idea

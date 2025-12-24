@@ -1,7 +1,7 @@
 {
   "name": "react-native-voice-ts",
   "description": "Advanced Speech-to-Text library for React Native with TypeScript support. Features ready-to-use components (VoiceMicrophone), custom hooks (useVoiceRecognition), real-time transcription, multi-language support, and comprehensive voice recognition capabilities for iOS and Android.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": "Noor Mohammad <noor.jsdivs@gmail.com>",
   "private": false,
   "homepage": "https://github.com/noorjsdivs/react-native-voice-ts",
@@ -94,7 +94,7 @@
     "lint:plugin": "eslint plugin/src/* --fix",
     "clean": "rm -rf dist && rm -rf plugin/build",
     "prepack": "yarn clean && yarn build && yarn build:plugin",
-    "test": "jest",
+    "test": "echo \"No tests in library root. Run 'yarn --cwd example test' to test the example app.\"",
     "validate": "yarn type-check && yarn lint:check && yarn format:check"
   },
   "dependencies": {

@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
 
   s.authors      = package['author']
   s.homepage     = package['homepage']
-  s.platform     = :ios, "9.0"
+  s.platform     = :ios, "13.4"
 
   # Link with Speech framework
   s.frameworks   = ['Speech']

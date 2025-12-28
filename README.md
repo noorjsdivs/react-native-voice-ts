@@ -104,6 +104,34 @@ cd ios && pod install && cd ..
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
 ```
 
+### 📱 Compatibility
+
+**React Native Versions**: 0.71.0 and above
+
+| React Native | iOS      | Android    | Status        |
+| ------------ | -------- | ---------- | ------------- |
+| 0.76.x       | ✅ 13.4+ | ✅ API 24+ | Full Support  |
+| 0.75.x       | ✅ 13.4+ | ✅ API 24+ | Full Support  |
+| 0.74.x       | ✅ 13.4+ | ✅ API 24+ | Full Support  |
+| 0.73.x       | ✅ 13.4+ | ✅ API 24+ | Full Support  |
+| 0.72.x       | ✅ 13.4+ | ✅ API 24+ | Full Support  |
+| 0.71.x       | ✅ 13.4+ | ✅ API 24+ | Full Support  |
+| < 0.71       | ❌       | ❌         | Not Supported |
+
+**Architecture Support**:
+
+- ✅ Old Architecture (Bridge) - Fully Supported
+- ✅ New Architecture (Turbo Modules & Fabric) - Fully Supported
+- ✅ Expo Projects (48.0.0+) - Supported with config plugin
+
+**Platform Requirements**:
+
+- **iOS**: 13.4 or higher
+- **Android**: API Level 24 (Android 7.0) or higher
+- **Node.js**: 18.0.0 or higher
+
+For detailed compatibility information and migration guides, see [COMPATIBILITY.md](./COMPATIBILITY.md).
+
 ---
 
 ## 🚀 Quick Start
